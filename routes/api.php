@@ -5,11 +5,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\TransaksiController;
 
 /*
 |--------------------------------------------------------------------------
-| API Routes — Tugas Framework Laravel ke-6: Middleware & Routing
-| Proyek: API Book Sales (REST API)
+| API Routes — Tugas Framework Laravel ke-6: Middleware & Routing (Book Sales)
 | Mahasiswa: MUHAMMAD RIZKI | Universitas Trisakti
 |--------------------------------------------------------------------------
 |
@@ -44,7 +44,17 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 // =========================================================================
-// 3. ROUTE KHUSUS ADMIN (Harus Login + Memiliki Role 'admin')
+// 3. ROUTE KHUSUS CUSTOMER (Harus Login + Role 'customer')
+// =========================================================================
+
+Route::middleware(['auth:sanctum', 'customer'])->group(function () {
+    // Operasi Transaksi bagi Customer: Create (store), Update, dan Show Detail
+    Route::apiResource('transaksi', TransaksiController::class)->only(['store', 'show', 'update']);
+});
+
+
+// =========================================================================
+// 4. ROUTE KHUSUS ADMIN (Harus Login + Role 'admin')
 // =========================================================================
 
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
@@ -52,4 +62,7 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::apiResource('authors', AuthorController::class)->only(['store', 'update', 'destroy']);
     Route::apiResource('genres', GenreController::class)->only(['store', 'update', 'destroy']);
     Route::apiResource('books', BookController::class)->only(['store', 'update', 'destroy']);
+
+    // Operasi Transaksi bagi Admin: Read All (index) dan Destroy (delete)
+    Route::apiResource('transaksi', TransaksiController::class)->only(['index', 'destroy']);
 });

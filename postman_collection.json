@@ -1,8 +1,8 @@
 {
 	"info": {
 		"_postman_id": "b9d3e871-331e-450a-bcf8-92582fbcf7c6",
-		"name": "Tugas Framework Laravel 6 - Middleware & Routing (API Book Sales)",
-		"description": "Koleksi Postman untuk Tugas Framework Laravel ke-6: Autentikasi Sanctum, Role Admin/User, Middleware IsAdmin, dan Pengelompokan Route API.",
+		"name": "Tugas Framework Laravel 6 - CRUD Transaksi & Role-Based Access Control (API Book Sales)",
+		"description": "Koleksi Postman untuk Tugas Framework Laravel ke-6: Autentikasi Sanctum, Role Admin/Customer, Middleware IsAdmin & IsCustomer, Pengelompokan Route API, dan CRUD Transaksi dengan Relasi Model.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"variable": [
@@ -17,7 +17,12 @@
 			"type": "string"
 		},
 		{
-			"key": "user_token",
+			"key": "customer1_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "customer2_token",
 			"value": "",
 			"type": "string"
 		}
@@ -27,7 +32,7 @@
 			"name": "1. Authentication",
 			"item": [
 				{
-					"name": "1. Register User Baru (201)",
+					"name": "1. Register Customer Baru (201)",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -71,7 +76,7 @@
 					}
 				},
 				{
-					"name": "3. Login User Biasa (200 - Save Token)",
+					"name": "3. Login Customer 1 (200 - Save Token)",
 					"event": [
 						{
 							"listen": "test",
@@ -79,7 +84,7 @@
 								"exec": [
 									"var jsonData = pm.response.json();",
 									"if (jsonData.data && jsonData.data.access_token) {",
-									"    pm.collectionVariables.set('user_token', jsonData.data.access_token);",
+									"    pm.collectionVariables.set('customer1_token', jsonData.data.access_token);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -94,13 +99,42 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password\"\n}"
+							"raw": "{\n  \"email\": \"customer1@example.com\",\n  \"password\": \"password\"\n}"
 						},
 						"url": { "raw": "{{base_url}}/api/login", "host": ["{{base_url}}"], "path": ["api", "login"] }
 					}
 				},
 				{
-					"name": "4. Get Profile (200 dengan Bearer Token)",
+					"name": "4. Login Customer 2 (200 - Save Token)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.data && jsonData.data.access_token) {",
+									"    pm.collectionVariables.set('customer2_token', jsonData.data.access_token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"customer2@example.com\",\n  \"password\": \"password\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/api/login", "host": ["{{base_url}}"], "path": ["api", "login"] }
+					}
+				},
+				{
+					"name": "5. Get Profile (200 dengan Bearer Token)",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -111,7 +145,7 @@
 					}
 				},
 				{
-					"name": "5. Logout (200)",
+					"name": "6. Logout (200)",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -158,17 +192,17 @@
 					}
 				},
 				{
-					"name": "4. POST Create Author - Token User Biasa (403)",
+					"name": "4. POST Create Author - Token Customer (403)",
 					"request": {
 						"method": "POST",
 						"header": [
 							{ "key": "Accept", "value": "application/json", "type": "text" },
 							{ "key": "Content-Type", "value": "application/json", "type": "text" },
-							{ "key": "Authorization", "value": "Bearer {{user_token}}", "type": "text" }
+							{ "key": "Authorization", "value": "Bearer {{customer1_token}}", "type": "text" }
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Penulis User Biasa\",\n  \"country\": \"Indonesia\"\n}"
+							"raw": "{\n  \"name\": \"Penulis Customer\",\n  \"country\": \"Indonesia\"\n}"
 						},
 						"url": { "raw": "{{base_url}}/api/authors", "host": ["{{base_url}}"], "path": ["api", "authors"] }
 					}
@@ -253,17 +287,17 @@
 					}
 				},
 				{
-					"name": "4. POST Create Genre - Token User Biasa (403)",
+					"name": "4. POST Create Genre - Token Customer (403)",
 					"request": {
 						"method": "POST",
 						"header": [
 							{ "key": "Accept", "value": "application/json", "type": "text" },
 							{ "key": "Content-Type", "value": "application/json", "type": "text" },
-							{ "key": "Authorization", "value": "Bearer {{user_token}}", "type": "text" }
+							{ "key": "Authorization", "value": "Bearer {{customer1_token}}", "type": "text" }
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Genre User Biasa\"\n}"
+							"raw": "{\n  \"name\": \"Genre Customer\"\n}"
 						},
 						"url": { "raw": "{{base_url}}/api/genres", "host": ["{{base_url}}"], "path": ["api", "genres"] }
 					}
@@ -348,17 +382,17 @@
 					}
 				},
 				{
-					"name": "4. POST Create Book - Token User Biasa (403)",
+					"name": "4. POST Create Book - Token Customer (403)",
 					"request": {
 						"method": "POST",
 						"header": [
 							{ "key": "Accept", "value": "application/json", "type": "text" },
 							{ "key": "Content-Type", "value": "application/json", "type": "text" },
-							{ "key": "Authorization", "value": "Bearer {{user_token}}", "type": "text" }
+							{ "key": "Authorization", "value": "Bearer {{customer1_token}}", "type": "text" }
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"author_id\": 1,\n  \"title\": \"Buku User Biasa\"\n}"
+							"raw": "{\n  \"author_id\": 1,\n  \"title\": \"Buku Customer\"\n}"
 						},
 						"url": { "raw": "{{base_url}}/api/books", "host": ["{{base_url}}"], "path": ["api", "books"] }
 					}
@@ -404,6 +438,196 @@
 							{ "key": "Authorization", "value": "Bearer {{admin_token}}", "type": "text" }
 						],
 						"url": { "raw": "{{base_url}}/api/books/1", "host": ["{{base_url}}"], "path": ["api", "books", "1"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Transaksi",
+			"item": [
+				{
+					"name": "1. GET All Transaksi - Tanpa Token (401)",
+					"request": {
+						"method": "GET",
+						"header": [ { "key": "Accept", "value": "application/json", "type": "text" } ],
+						"url": { "raw": "{{base_url}}/api/transaksi", "host": ["{{base_url}}"], "path": ["api", "transaksi"] }
+					}
+				},
+				{
+					"name": "2. POST Create Transaksi - Tanpa Token (401)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"book_id\": 1,\n  \"jumlah\": 2\n}"
+						},
+						"url": { "raw": "{{base_url}}/api/transaksi", "host": ["{{base_url}}"], "path": ["api", "transaksi"] }
+					}
+				},
+				{
+					"name": "3. POST Create Transaksi - Token Customer 1 (201 - Total Harga Dihitung Otomatis)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" },
+							{ "key": "Authorization", "value": "Bearer {{customer1_token}}", "type": "text" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"book_id\": 1,\n  \"jumlah\": 2\n}"
+						},
+						"url": { "raw": "{{base_url}}/api/transaksi", "host": ["{{base_url}}"], "path": ["api", "transaksi"] }
+					}
+				},
+				{
+					"name": "4. POST Create Transaksi - Gagal Validasi Book Tidak Ada (422)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" },
+							{ "key": "Authorization", "value": "Bearer {{customer1_token}}", "type": "text" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"book_id\": 99999,\n  \"jumlah\": 2\n}"
+						},
+						"url": { "raw": "{{base_url}}/api/transaksi", "host": ["{{base_url}}"], "path": ["api", "transaksi"] }
+					}
+				},
+				{
+					"name": "5. POST Create Transaksi - Gagal Validasi Jumlah 0 (422)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" },
+							{ "key": "Authorization", "value": "Bearer {{customer1_token}}", "type": "text" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"book_id\": 1,\n  \"jumlah\": 0\n}"
+						},
+						"url": { "raw": "{{base_url}}/api/transaksi", "host": ["{{base_url}}"], "path": ["api", "transaksi"] }
+					}
+				},
+				{
+					"name": "6. GET Detail Transaksi Milik Sendiri - Token Customer 1 (200 - Eager Loading Relasi)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Authorization", "value": "Bearer {{customer1_token}}", "type": "text" }
+						],
+						"url": { "raw": "{{base_url}}/api/transaksi/1", "host": ["{{base_url}}"], "path": ["api", "transaksi", "1"] }
+					}
+				},
+				{
+					"name": "7. GET Detail Transaksi Milik Customer 1 oleh Customer 2 (403 Forbidden)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Authorization", "value": "Bearer {{customer2_token}}", "type": "text" }
+						],
+						"url": { "raw": "{{base_url}}/api/transaksi/1", "host": ["{{base_url}}"], "path": ["api", "transaksi", "1"] }
+					}
+				},
+				{
+					"name": "8. PUT Update Transaksi Milik Sendiri - Token Customer 1 (200)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" },
+							{ "key": "Authorization", "value": "Bearer {{customer1_token}}", "type": "text" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"jumlah\": 3,\n  \"status\": \"paid\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/api/transaksi/1", "host": ["{{base_url}}"], "path": ["api", "transaksi", "1"] }
+					}
+				},
+				{
+					"name": "9. PUT Update Transaksi Milik Customer 1 oleh Customer 2 (403 Forbidden)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" },
+							{ "key": "Authorization", "value": "Bearer {{customer2_token}}", "type": "text" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"jumlah\": 5\n}"
+						},
+						"url": { "raw": "{{base_url}}/api/transaksi/1", "host": ["{{base_url}}"], "path": ["api", "transaksi", "1"] }
+					}
+				},
+				{
+					"name": "10. GET All Transaksi oleh Customer 1 (403 Forbidden)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Authorization", "value": "Bearer {{customer1_token}}", "type": "text" }
+						],
+						"url": { "raw": "{{base_url}}/api/transaksi", "host": ["{{base_url}}"], "path": ["api", "transaksi"] }
+					}
+				},
+				{
+					"name": "11. DELETE Transaksi oleh Customer 1 (403 Forbidden)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Authorization", "value": "Bearer {{customer1_token}}", "type": "text" }
+						],
+						"url": { "raw": "{{base_url}}/api/transaksi/1", "host": ["{{base_url}}"], "path": ["api", "transaksi", "1"] }
+					}
+				},
+				{
+					"name": "12. GET All Transaksi - Token Admin (200 - Eager Loading Relasi user & book)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Authorization", "value": "Bearer {{admin_token}}", "type": "text" }
+						],
+						"url": { "raw": "{{base_url}}/api/transaksi", "host": ["{{base_url}}"], "path": ["api", "transaksi"] }
+					}
+				},
+				{
+					"name": "13. POST Create Transaksi oleh Admin (403 Forbidden - Khusus Customer)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" },
+							{ "key": "Authorization", "value": "Bearer {{admin_token}}", "type": "text" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"book_id\": 1,\n  \"jumlah\": 1\n}"
+						},
+						"url": { "raw": "{{base_url}}/api/transaksi", "host": ["{{base_url}}"], "path": ["api", "transaksi"] }
+					}
+				},
+				{
+					"name": "14. DELETE Transaksi - Token Admin (200 Sukses)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Authorization", "value": "Bearer {{admin_token}}", "type": "text" }
+						],
+						"url": { "raw": "{{base_url}}/api/transaksi/1", "host": ["{{base_url}}"], "path": ["api", "transaksi", "1"] }
 					}
 				}
 			]

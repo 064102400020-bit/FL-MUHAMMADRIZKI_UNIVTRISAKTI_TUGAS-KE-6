@@ -21,12 +21,12 @@ class AuthController extends Controller
             'password' => 'required|string|min:6',
         ]);
 
-        // Tetapkan role default 'user' untuk keamanan
+        // Tetapkan role default 'customer' untuk pengguna baru
         $user = User::create([
             'name'     => $validated['name'],
             'email'    => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'role'     => 'user',
+            'role'     => 'customer',
         ]);
 
         // Buat Sanctum token untuk user yang baru mendaftar

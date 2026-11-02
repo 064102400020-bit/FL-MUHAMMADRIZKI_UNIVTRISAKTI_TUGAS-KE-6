@@ -17,7 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Registrasi alias middleware kustom
         $middleware->alias([
-            'admin' => \App\Http\Middleware\IsAdmin::class,
+            'admin'    => \App\Http\Middleware\IsAdmin::class,
+            'customer' => \App\Http\Middleware\IsCustomer::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

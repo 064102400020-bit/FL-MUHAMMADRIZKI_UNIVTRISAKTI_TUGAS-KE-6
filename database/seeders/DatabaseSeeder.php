@@ -15,12 +15,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Jalankan seeder genre, author, buku, dan user akun testing
+        // Jalankan seeder sesuai urutan relasi (Users & Authors/Genres -> Books -> Transaksis)
         $this->call([
+            UserSeeder::class,
             GenreSeeder::class,
             AuthorSeeder::class,
             BookSeeder::class,
-            UserSeeder::class,
+            TransaksiSeeder::class,
         ]);
     }
 }

@@ -35,4 +35,12 @@ class Book extends Model
     {
         return $this->belongsTo(Genre::class);
     }
+
+    /**
+     * Relasi kebalikannya: satu Book dapat memiliki banyak Transaksi.
+     */
+    public function transaksis()
+    {
+        return $this->hasMany(Transaksi::class);
+    }
 }

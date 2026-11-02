@@ -56,4 +56,20 @@ class User extends Authenticatable
     {
         return $this->role === 'admin';
     }
+
+    /**
+     * Helper untuk cek apakah user memiliki role customer.
+     */
+    public function isCustomer(): bool
+    {
+        return $this->role === 'customer';
+    }
+
+    /**
+     * Relasi kebalikannya: satu User dapat memiliki banyak Transaksi.
+     */
+    public function transaksis()
+    {
+        return $this->hasMany(Transaksi::class);
+    }
 }

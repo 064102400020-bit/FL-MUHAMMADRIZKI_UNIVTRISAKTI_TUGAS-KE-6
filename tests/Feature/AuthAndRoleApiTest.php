@@ -86,7 +86,7 @@ class AuthAndRoleApiTest extends TestCase
 
         $this->assertDatabaseHas('users', [
             'email' => 'mahasiswa@example.com',
-            'role'  => 'user', // Default harus 'user'
+            'role'  => 'customer', // Default harus 'customer'
         ]);
     }
 
