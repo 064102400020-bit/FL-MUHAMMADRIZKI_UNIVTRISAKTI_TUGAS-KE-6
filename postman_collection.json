@@ -1,0 +1,412 @@
+{
+	"info": {
+		"_postman_id": "b9d3e871-331e-450a-bcf8-92582fbcf7c6",
+		"name": "Tugas Framework Laravel 6 - Middleware & Routing (API Book Sales)",
+		"description": "Koleksi Postman untuk Tugas Framework Laravel ke-6: Autentikasi Sanctum, Role Admin/User, Middleware IsAdmin, dan Pengelompokan Route API.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://127.0.0.1:8000",
+			"type": "string"
+		},
+		{
+			"key": "admin_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Authentication",
+			"item": [
+				{
+					"name": "1. Register User Baru (201)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Mahasiswa Penguji\",\n  \"email\": \"penguji@example.com\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/api/register", "host": ["{{base_url}}"], "path": ["api", "register"] }
+					}
+				},
+				{
+					"name": "2. Login Admin (200 - Save Token)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.data && jsonData.data.access_token) {",
+									"    pm.collectionVariables.set('admin_token', jsonData.data.access_token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/api/login", "host": ["{{base_url}}"], "path": ["api", "login"] }
+					}
+				},
+				{
+					"name": "3. Login User Biasa (200 - Save Token)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.data && jsonData.data.access_token) {",
+									"    pm.collectionVariables.set('user_token', jsonData.data.access_token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/api/login", "host": ["{{base_url}}"], "path": ["api", "login"] }
+					}
+				},
+				{
+					"name": "4. Get Profile (200 dengan Bearer Token)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Authorization", "value": "Bearer {{admin_token}}", "type": "text" }
+						],
+						"url": { "raw": "{{base_url}}/api/profile", "host": ["{{base_url}}"], "path": ["api", "profile"] }
+					}
+				},
+				{
+					"name": "5. Logout (200)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Authorization", "value": "Bearer {{admin_token}}", "type": "text" }
+						],
+						"url": { "raw": "{{base_url}}/api/logout", "host": ["{{base_url}}"], "path": ["api", "logout"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Authors",
+			"item": [
+				{
+					"name": "1. GET All Authors - Publik Tanpa Token (200)",
+					"request": {
+						"method": "GET",
+						"header": [ { "key": "Accept", "value": "application/json", "type": "text" } ],
+						"url": { "raw": "{{base_url}}/api/authors", "host": ["{{base_url}}"], "path": ["api", "authors"] }
+					}
+				},
+				{
+					"name": "2. GET Author Detail - Publik Tanpa Token (200)",
+					"request": {
+						"method": "GET",
+						"header": [ { "key": "Accept", "value": "application/json", "type": "text" } ],
+						"url": { "raw": "{{base_url}}/api/authors/1", "host": ["{{base_url}}"], "path": ["api", "authors", "1"] }
+					}
+				},
+				{
+					"name": "3. POST Create Author - Tanpa Token (401)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Penulis Tanpa Token\",\n  \"country\": \"Indonesia\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/api/authors", "host": ["{{base_url}}"], "path": ["api", "authors"] }
+					}
+				},
+				{
+					"name": "4. POST Create Author - Token User Biasa (403)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" },
+							{ "key": "Authorization", "value": "Bearer {{user_token}}", "type": "text" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Penulis User Biasa\",\n  \"country\": \"Indonesia\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/api/authors", "host": ["{{base_url}}"], "path": ["api", "authors"] }
+					}
+				},
+				{
+					"name": "5. POST Create Author - Token Admin (201)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" },
+							{ "key": "Authorization", "value": "Bearer {{admin_token}}", "type": "text" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Habiburrahman El Shirazy\",\n  \"bio\": \"Penulis novel Ayat-Ayat Cinta\",\n  \"country\": \"Indonesia\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/api/authors", "host": ["{{base_url}}"], "path": ["api", "authors"] }
+					}
+				},
+				{
+					"name": "6. PUT Update Author - Token Admin (200)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" },
+							{ "key": "Authorization", "value": "Bearer {{admin_token}}", "type": "text" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Habiburrahman El Shirazy (Updated)\",\n  \"bio\": \"Novelis nomor 1 Indonesia\",\n  \"country\": \"Indonesia\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/api/authors/1", "host": ["{{base_url}}"], "path": ["api", "authors", "1"] }
+					}
+				},
+				{
+					"name": "7. DELETE Author - Token Admin (200)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Authorization", "value": "Bearer {{admin_token}}", "type": "text" }
+						],
+						"url": { "raw": "{{base_url}}/api/authors/5", "host": ["{{base_url}}"], "path": ["api", "authors", "5"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Genres",
+			"item": [
+				{
+					"name": "1. GET All Genres - Publik Tanpa Token (200)",
+					"request": {
+						"method": "GET",
+						"header": [ { "key": "Accept", "value": "application/json", "type": "text" } ],
+						"url": { "raw": "{{base_url}}/api/genres", "host": ["{{base_url}}"], "path": ["api", "genres"] }
+					}
+				},
+				{
+					"name": "2. GET Genre Detail - Publik Tanpa Token (200)",
+					"request": {
+						"method": "GET",
+						"header": [ { "key": "Accept", "value": "application/json", "type": "text" } ],
+						"url": { "raw": "{{base_url}}/api/genres/1", "host": ["{{base_url}}"], "path": ["api", "genres", "1"] }
+					}
+				},
+				{
+					"name": "3. POST Create Genre - Tanpa Token (401)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Genre Tanpa Token\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/api/genres", "host": ["{{base_url}}"], "path": ["api", "genres"] }
+					}
+				},
+				{
+					"name": "4. POST Create Genre - Token User Biasa (403)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" },
+							{ "key": "Authorization", "value": "Bearer {{user_token}}", "type": "text" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Genre User Biasa\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/api/genres", "host": ["{{base_url}}"], "path": ["api", "genres"] }
+					}
+				},
+				{
+					"name": "5. POST Create Genre - Token Admin (201)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" },
+							{ "key": "Authorization", "value": "Bearer {{admin_token}}", "type": "text" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Sains Fiksi (Sci-Fi)\",\n  \"description\": \"Kisah berbasis eksplorasi teknologi masa depan dan antariksa.\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/api/genres", "host": ["{{base_url}}"], "path": ["api", "genres"] }
+					}
+				},
+				{
+					"name": "6. PUT Update Genre - Token Admin (200)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" },
+							{ "key": "Authorization", "value": "Bearer {{admin_token}}", "type": "text" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Fiksi Spekulatif (Sci-Fi)\",\n  \"description\": \"Deskripsi genre diperbarui oleh admin.\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/api/genres/1", "host": ["{{base_url}}"], "path": ["api", "genres", "1"] }
+					}
+				},
+				{
+					"name": "7. DELETE Genre - Token Admin (200)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Authorization", "value": "Bearer {{admin_token}}", "type": "text" }
+						],
+						"url": { "raw": "{{base_url}}/api/genres/5", "host": ["{{base_url}}"], "path": ["api", "genres", "5"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Books",
+			"item": [
+				{
+					"name": "1. GET All Books - Publik Tanpa Token (200)",
+					"request": {
+						"method": "GET",
+						"header": [ { "key": "Accept", "value": "application/json", "type": "text" } ],
+						"url": { "raw": "{{base_url}}/api/books", "host": ["{{base_url}}"], "path": ["api", "books"] }
+					}
+				},
+				{
+					"name": "2. GET Book Detail - Publik Tanpa Token (200)",
+					"request": {
+						"method": "GET",
+						"header": [ { "key": "Accept", "value": "application/json", "type": "text" } ],
+						"url": { "raw": "{{base_url}}/api/books/1", "host": ["{{base_url}}"], "path": ["api", "books", "1"] }
+					}
+				},
+				{
+					"name": "3. POST Create Book - Tanpa Token (401)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"author_id\": 1,\n  \"title\": \"Buku Tanpa Token\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/api/books", "host": ["{{base_url}}"], "path": ["api", "books"] }
+					}
+				},
+				{
+					"name": "4. POST Create Book - Token User Biasa (403)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" },
+							{ "key": "Authorization", "value": "Bearer {{user_token}}", "type": "text" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"author_id\": 1,\n  \"title\": \"Buku User Biasa\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/api/books", "host": ["{{base_url}}"], "path": ["api", "books"] }
+					}
+				},
+				{
+					"name": "5. POST Create Book - Token Admin (201)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" },
+							{ "key": "Authorization", "value": "Bearer {{admin_token}}", "type": "text" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"author_id\": 1,\n  \"genre_id\": 1,\n  \"title\": \"Anak Semua Bangsa\",\n  \"isbn\": \"978-979-973-124-8\",\n  \"description\": \"Buku kedua dari Tetralogi Buru karya Pramoedya Ananta Toer.\",\n  \"price\": 110000,\n  \"stock\": 25,\n  \"year\": 1981\n}"
+						},
+						"url": { "raw": "{{base_url}}/api/books", "host": ["{{base_url}}"], "path": ["api", "books"] }
+					}
+				},
+				{
+					"name": "6. PUT Update Book - Token Admin (200)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" },
+							{ "key": "Authorization", "value": "Bearer {{admin_token}}", "type": "text" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Bumi Manusia (Hard Cover Edition)\",\n  \"price\": 135000,\n  \"stock\": 50\n}"
+						},
+						"url": { "raw": "{{base_url}}/api/books/1", "host": ["{{base_url}}"], "path": ["api", "books", "1"] }
+					}
+				},
+				{
+					"name": "7. DELETE Book - Token Admin (200)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json", "type": "text" },
+							{ "key": "Authorization", "value": "Bearer {{admin_token}}", "type": "text" }
+						],
+						"url": { "raw": "{{base_url}}/api/books/1", "host": ["{{base_url}}"], "path": ["api", "books", "1"] }
+					}
+				}
+			]
+		}
+	]
+}
